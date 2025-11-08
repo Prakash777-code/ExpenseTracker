@@ -16,4 +16,12 @@ public class Expense {
     public Double getAmount(){
         return amount;
     }
+
+    public void setTitle(String title){
+        this.title = title;
+    }
+
+    public void setAmount(double amount){
+        this.amount = amount;
+    }
 }

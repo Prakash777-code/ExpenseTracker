@@ -27,5 +27,12 @@
         android:textColor="@color/white"
         android:textSize="19sp"/>
 
+    <ImageView
+        android:id="@+id/btnEdit"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:contentDescription="Edit"/>
+
 
 </LinearLayout>

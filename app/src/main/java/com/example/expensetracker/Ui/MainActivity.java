@@ -25,10 +25,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+
     private ExpenseViewModel expenseViewModel;
     private ExpenseAdapter expenseAdapter;
     private RecyclerView recyclerView;
@@ -45,20 +45,24 @@ public class MainActivity extends AppCompatActivity {
         textTotal = findViewById(R.id.textTotal);
         floatingButton = findViewById(R.id.folatingButton);
 
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        expenseAdapter = new ExpenseAdapter(new ArrayList<>());
-        recyclerView.setAdapter(expenseAdapter);
-
 
         expenseViewModel = new ViewModelProvider(this).get(ExpenseViewModel.class);
+
+
+        expenseAdapter = new ExpenseAdapter(this, new ArrayList<>(), new ExpenseAdapter.ExpenseListener() {
+            @Override
+            public void onExpenseEdited() {
+                expenseViewModel.recalculateTotal();
+            }
+        });
+        recyclerView.setAdapter(expenseAdapter);
 
 
         expenseViewModel.getExpense().observe(this, new Observer<ArrayList<Expense>>() {
             @Override
             public void onChanged(ArrayList<Expense> expenses) {
-                expenseAdapter = new ExpenseAdapter(expenses);
-                recyclerView.setAdapter(expenseAdapter);
+                expenseAdapter.updateList(expenses);
             }
         });
 
@@ -66,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
         expenseViewModel.getTotal().observe(this, new Observer<Double>() {
             @Override
             public void onChanged(Double total) {
-                NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("en","IN"));
-                String formatedTotal = format.format(total)  ;
-                textTotal.setText("Total: " + total);
+                NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("en", "IN"));
+                String formattedTotal = format.format(total);
+                textTotal.setText("Total: " + formattedTotal);
             }
         });
 
@@ -103,13 +107,14 @@ public class MainActivity extends AppCompatActivity {
                         expenseViewModel.addExpense(name, amount);
                         Toast.makeText(MainActivity.this, AppConstant.MESSAGE_ADDED, Toast.LENGTH_SHORT).show();
                     } catch (NumberFormatException e) {
-                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "Invalid amount", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(MainActivity.this, AppConstant.MESSAGE_INVALID_INPUT, Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
         builder.setNegativeButton("Cancel", null);
         builder.create().show();
     }
